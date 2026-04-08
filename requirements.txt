@@ -1,0 +1,10 @@
+paramiko
+psycopg[binary]
+prometheus-client
+requests
+python-dotenv
+
+pytest
+ruff
+bandit
+pip-audit

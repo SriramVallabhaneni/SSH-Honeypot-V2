@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+# Virtual environments
+venv/
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Coverage / test artifacts
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Ruff / tooling
+.ruff_cache/
+
+# Docker
+*.pid
+*.sock
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Secrets (IMPORTANT)
+*.pem
+*.key
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# Misc
+*.swp
+*.swo
