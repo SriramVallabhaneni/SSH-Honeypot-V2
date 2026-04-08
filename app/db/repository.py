@@ -59,3 +59,23 @@ class HoneypotRepository:
         with self.connection.cursor() as cur:
             cur.executemany(query, rows)
         self.connection.commit()
+
+    def get_total_attempts(self) -> int:
+        query = "SELECT COUNT(*) AS count FROM connections;"
+        with self.connection.cursor() as cur:
+            cur.execute(query)
+            return cur.fetchone()["count"]
+
+
+    def get_unique_ips(self) -> int:
+        query = "SELECT COUNT(DISTINCT source_ip) AS count FROM connections;"
+        with self.connection.cursor() as cur:
+            cur.execute(query)
+            return cur.fetchone()["count"]
+
+
+    def get_total_credentials(self) -> int:
+        query = "SELECT COUNT(*) AS count FROM credentials;"
+        with self.connection.cursor() as cur:
+            cur.execute(query)
+            return cur.fetchone()["count"]  
