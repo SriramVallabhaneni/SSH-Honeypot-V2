@@ -4,7 +4,6 @@ import requests
 
 from app.honeypot.config import Config
 
-
 _cache: dict[str, dict] = {}
 
 

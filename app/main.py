@@ -1,9 +1,9 @@
-from app.db.init_db import initialize_db
-from app.honeypot.config import load_config
-from app.honeypot.server import start_server
-from app.exporter.exporter import start_exporter
 import threading
 
+from app.db.init_db import initialize_db
+from app.exporter.exporter import start_exporter
+from app.honeypot.config import load_config
+from app.honeypot.server import start_server
 
 
 def main() -> None:

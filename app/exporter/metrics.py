@@ -1,6 +1,5 @@
 from prometheus_client import Gauge
 
-
 total_attempts = Gauge(
     "honeypot_total_attempts",
     "Total number of connection attempts",

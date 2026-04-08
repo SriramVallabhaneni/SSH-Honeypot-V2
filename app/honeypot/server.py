@@ -11,7 +11,6 @@ from app.honeypot.auth import SSHServerHandler
 from app.honeypot.config import Config
 from app.honeypot.session import SessionRecord
 
-
 HOST_KEY_PATH = "server.key"
 
 
