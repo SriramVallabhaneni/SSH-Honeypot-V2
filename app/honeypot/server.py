@@ -1,7 +1,7 @@
+import logging
 import os
 import socket
 import threading
-import logging
 
 import paramiko
 
@@ -44,8 +44,10 @@ def handle_connection(client_socket, client_address, host_key, config: Config) -
         session.client_banner = transport.remote_version
         transport.accept(5)
 
-    except Exception as exc:
-        logger.exception("Error handling SSH connection from %s:%s", client_address[0], client_address[1])
+    except Exception:
+        logger.exception("Error handling SSH connection from %s:%s", 
+                         client_address[0], 
+                         client_address[1])
     finally:
         session.finish()
 
