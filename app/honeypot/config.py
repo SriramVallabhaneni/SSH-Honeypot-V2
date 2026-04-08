@@ -37,7 +37,8 @@ def load_config() -> Config:
     return Config(
         app_env=os.getenv("APP_ENV", "development"),
         log_level=os.getenv("LOG_LEVEL", "INFO"),
-        honeypot_host=os.getenv("HONEYPOT_HOST", "0.0.0.0"),
+        # Honeypot must bind to all interfaces to receive external traffic
+        honeypot_host=os.getenv("HONEYPOT_HOST", "0.0.0.0"),  # nosec B104,
         honeypot_port=int(os.getenv("HONEYPOT_PORT", "2222")),
         max_connections=int(os.getenv("MAX_CONNECTIONS", "50")),
         ssh_banner=os.getenv(

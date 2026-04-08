@@ -1,6 +1,7 @@
 import os
 import socket
 import threading
+import logging
 
 import paramiko
 
@@ -12,6 +13,8 @@ from app.honeypot.config import Config
 from app.honeypot.session import SessionRecord
 
 HOST_KEY_PATH = "server.key"
+
+logger = logging.getLogger(__name__)
 
 
 def load_or_create_host_key(path: str = HOST_KEY_PATH) -> paramiko.RSAKey:
@@ -41,8 +44,8 @@ def handle_connection(client_socket, client_address, host_key, config: Config) -
         session.client_banner = transport.remote_version
         transport.accept(5)
 
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.exception("Error handling SSH connection from %s:%s", client_address[0], client_address[1])
     finally:
         session.finish()
 
