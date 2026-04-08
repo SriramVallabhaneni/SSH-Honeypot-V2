@@ -30,10 +30,18 @@ resource "aws_route_table_association" "assoc" {
 resource "aws_security_group" "honeypot_sg" {
   vpc_id = aws_vpc.main.id
 
-  # Honeypot SSH (open to world)
+  # SSH Access (open to me)
   ingress {
     from_port   = 22
     to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.allowed_ip]
+  }
+  
+  # Honeypot SSH (open to world)
+  ingress {
+    from_port   = 2222
+    to_port     = 2222
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -63,6 +71,14 @@ resource "aws_security_group" "honeypot_sg" {
   }
 }
 
+locals {
+  user_data = templatefile("${path.module}/user_data.sh.tpl", {
+    repo_url          = var.repo_url
+    app_dir           = var.app_dir
+    postgres_password = var.postgres_password
+  })
+}
+
 resource "aws_instance" "honeypot" {
   ami           = "ami-0507f5acd9ba8e6b7" # update per region
   instance_type = var.instance_type
@@ -70,7 +86,8 @@ resource "aws_instance" "honeypot" {
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.honeypot_sg.id]
 
-  key_name = var.key_name
+  key_name               = var.key_name
+  user_data              = local.user_data
 
   tags = {
     Name = "honeypot-v2"

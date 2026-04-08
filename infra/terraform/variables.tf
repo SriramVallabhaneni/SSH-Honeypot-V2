@@ -1,9 +1,7 @@
 variable "aws_region" {
-  default = "us-west-1"
 }
 
 variable "instance_type" {
-  default = "t3.micro"
 }
 
 variable "key_name" {
@@ -12,4 +10,18 @@ variable "key_name" {
 
 variable "allowed_ip" {
   description = "Your IP for admin access"
+}
+
+variable "repo_url" {
+  description = "Public GitHub repository URL"
+}
+
+variable "app_dir" {
+  description = "Directory on the EC2 instance where the app will live"
+  default     = "/opt/ssh-honeypot-v2"
+}
+
+variable "postgres_password" {
+  description = "Password for the internal Postgres container"
+  sensitive   = true
 }
