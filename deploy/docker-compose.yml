@@ -1,14 +1,10 @@
 services:
   postgres:
     image: postgres:16
-    environment:
-      POSTGRES_DB: honeypot
-      POSTGRES_USER: honeypot
-      POSTGRES_PASSWORD: honeypot
+    ebv_file:
+      - ../.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
   app:
     build: ..
