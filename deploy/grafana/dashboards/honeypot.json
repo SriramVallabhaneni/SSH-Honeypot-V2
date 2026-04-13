@@ -172,6 +172,10 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "editorMode": "builder",
           "expr": "honeypot_total_credentials",
           "legendFormat": "__auto",
@@ -236,6 +240,10 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "editorMode": "builder",
           "expr": "honeypot_unique_ips",
           "legendFormat": "__auto",
