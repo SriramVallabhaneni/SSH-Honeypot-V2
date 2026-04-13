@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16
-    ebv_file:
+    env_file:
       - ../.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
