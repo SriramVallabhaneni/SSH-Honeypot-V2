@@ -6,15 +6,20 @@ A cloud-deployed SSH honeypot platform that captures real-world brute-force atta
 
 ## What It Does
 
-The system exposes a fake SSH service to the internet. Automated scanners and bots attempt to log in — every connection attempt, credential pair, and session fingerprint is captured, enriched with geolocation data, and stored in PostgreSQL. A Prometheus exporter surfaces aggregate attack metrics, which Grafana visualizes in real time.
+The system exposes a fake SSH service to the internet. Automated scanners and bots attempt to log in and every connection attempt, credential pair, and session fingerprint is captured, enriched with geolocation data, and stored in PostgreSQL. A Prometheus exporter surfaces aggregate attack metrics, which Grafana visualizes in real time.
 
 This is not a pre-built tool. The SSH server, authentication handler, session model, metrics exporter, and enrichment pipeline are all custom-written.
 
 ---
 
+## Dashboard Example
+![Grafana Dashboard](screenshots/Grafana-Dashboard-Screenshot.png)
+
+---
+
 ## Why It Was Built
 
-This project was designed as a hands-on DevSecOps platform — not just a security experiment, but a system that demonstrates:
+This project was designed as a hands-on DevSecOps platform. Not just a security experiment, but a system that demonstrates:
 
 - **Security engineering** — custom honeypot with real attack telemetry
 - **DevOps** — containerized, reproducible, and automatically deployed
@@ -107,7 +112,7 @@ SSH-Honeypot-V2/
 ## How It Works
 
 1. The honeypot listens for inbound SSH connections on port 2222 (public-facing)
-2. Every connection is accepted; authentication always fails — but usernames, passwords, and session metadata are captured before rejection
+2. Every connection is accepted; authentication always fails but usernames, passwords, and session metadata are captured before rejection
 3. Each attacker's public IP is enriched with geolocation (country, city, coordinates) via a cached external API call
 4. The complete session record is written to PostgreSQL with a foreign-key relationship between connections and credential attempts
 5. A Prometheus exporter periodically queries PostgreSQL and exposes aggregate metrics at `/metrics`
@@ -186,7 +191,7 @@ Test the honeypot:
 
 ```bash
 ssh -p 2222 test@localhost
-# type any password — the attempt is logged and rejected
+# type any password, the attempt is logged and rejected
 ```
 
 Check data:
@@ -223,7 +228,7 @@ After apply, the instance self-configures and the full stack starts automaticall
 
 ## Security Design
 
-- The honeypot never grants access — all authentication attempts fail by design
+- The honeypot never grants access, all authentication attempts fail by design
 - Monitoring ports (Grafana, Prometheus) are restricted to trusted IPs via security group rules
 - PostgreSQL is not exposed externally; it is internal to the Docker network
 - Credentials and sensitive config are injected via environment variables, not hardcoded
@@ -234,7 +239,7 @@ After apply, the instance self-configures and the full stack starts automaticall
 
 ## Known Limitations and Future Work
 
-- **Port separation:** Honeypot currently runs on port 2222. The intended production layout moves the honeypot to port 22 and restricts real admin SSH to a separate port — this requires reconfiguring the host SSH daemon at bootstrap, which is straightforward but was deferred.
+- **Port separation:** Honeypot currently runs on port 2222. The intended production layout moves the honeypot to port 22 and restricts real admin SSH to a separate port. This requires reconfiguring the host SSH daemon at bootstrap, which is straightforward but I chose not to at this stage.
 - **GeoIP provider:** The current provider uses HTTP. A future improvement is switching to a provider with HTTPS and a higher rate limit.
 - **Private IP detection:** The current check is a simple prefix match. A more robust implementation uses Python's `ipaddress` module to catch all reserved ranges.
 - **Alerting:** Prometheus alert rules and Grafana alerts (e.g., for attack spikes or service downtime) are not yet configured.
