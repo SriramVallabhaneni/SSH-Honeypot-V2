@@ -13,7 +13,7 @@ This is not a pre-built tool. The SSH server, authentication handler, session mo
 ---
 
 ## Dashboard Example
-![Grafana Dashboard](screenshots/Grafana-Dashboard-Screenshot.png)
+![Grafana Dashboard](screenshots/Grafana-Dashboard-Updated-Screenshot.png)
 
 ---
 
