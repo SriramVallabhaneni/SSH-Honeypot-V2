@@ -74,7 +74,7 @@ CI/CD:          GitHub Actions (CI gate → CD deploy)
 | Storage | PostgreSQL (psycopg) |
 | Observability | Prometheus, Grafana |
 | Containerization | Docker, Docker Compose |
-| Infrastructure | Terraform, AWS (VPC, EC2, Security Groups, IAM) |
+| Infrastructure | Terraform, AWS (EC2, Security Groups) |
 | CI/CD | GitHub Actions |
 | Security scanning | Bandit, pip-audit |
 | Linting / testing | Ruff, Pytest |
@@ -96,7 +96,7 @@ SSH-Honeypot-V2/
 │   ├── prometheus.yml
 │   └── grafana/          # Provisioned datasources and dashboards
 ├── infra/
-│   └── terraform/        # VPC, subnet, IGW, security groups, EC2, IAM
+│   └── terraform/        # security groups, EC2
 ├── tests/                # Unit tests for config, session, geoip
 ├── .github/
 │   └── workflows/
@@ -160,7 +160,6 @@ Terraform provisions the complete AWS environment from scratch:
 | Route table + association | Routes external traffic through the IGW |
 | Security group | Controls port access (honeypot public, monitoring restricted) |
 | EC2 instance | Runs the full Docker Compose stack |
-| IAM role | Least-privilege instance profile |
 
 The EC2 instance bootstraps itself on first boot via a `user_data` script: installs Docker, clones the repo, writes the runtime `.env`, and starts the stack. No manual setup required after `terraform apply`.
 
