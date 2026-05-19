@@ -20,6 +20,7 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            docker system prune -f
             cd /opt/ssh-honeypot-v2
             git pull
             cd deploy
