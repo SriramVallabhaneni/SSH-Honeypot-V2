@@ -27,6 +27,7 @@ jobs:
             --instance-id ${{ secrets.EC2_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
             --parameters 'commands=[
+              "git config --global --add safe.directory /opt/ssh-honeypot-v2",
               "docker system prune -f",
               "cd /opt/ssh-honeypot-v2 && git pull",
               "cd /opt/ssh-honeypot-v2/deploy && docker compose down && docker compose up -d --build"
