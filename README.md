@@ -13,7 +13,11 @@ This is not a pre-built tool. The SSH server, authentication handler, session mo
 ---
 
 ## Dashboard Examples
+
+Honeypot Metrics
 ![Honeypot Metrics Dashboard](screenshots/Honeypot-Metrics-Screenshot.png)
+
+System Metrics
 ![System Metrics Dashboard](screenshots/System-Metrics-Screenshot.png)
 
 ---
