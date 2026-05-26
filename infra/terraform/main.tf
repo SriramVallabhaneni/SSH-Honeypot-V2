@@ -30,7 +30,7 @@ resource "aws_route_table_association" "assoc" {
 resource "aws_security_group" "honeypot_sg" {
   vpc_id = aws_vpc.main.id
 
-  # SSH Access (open to world for github actions access)
+  # SSH Access (restrict to your IP)
   ingress {
     from_port   = 22
     to_port     = 22

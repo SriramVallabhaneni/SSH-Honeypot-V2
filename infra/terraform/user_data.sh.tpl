@@ -14,6 +14,7 @@ usermod -aG docker ubuntu
 mkdir -p /opt
 cd /opt
 
+# ADD THIS LINE: git config --system --add safe.directory ${app_dir}
 if [ ! -d "${app_dir}" ]; then
   git clone ${repo_url} ${app_dir}
 else
