@@ -12,8 +12,9 @@ This is not a pre-built tool. The SSH server, authentication handler, session mo
 
 ---
 
-## Dashboard Example
-![Grafana Dashboard](screenshots/Grafana-Dashboard-Updated-Screenshot.png)
+## Dashboard Examples
+![Honeypot Metrics Dashboard](screenshots/Honeypot-Metrics-Screenshot.png)
+![System Metrics Dashboard](screenshots/System-Metrics-Screenshot.png)
 
 ---
 
