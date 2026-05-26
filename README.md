@@ -74,7 +74,7 @@ CI/CD:          GitHub Actions (CI gate → CD deploy)
 | Storage | PostgreSQL (psycopg) |
 | Observability | Prometheus, Grafana |
 | Containerization | Docker, Docker Compose |
-| Infrastructure | Terraform, AWS (EC2, Security Groups) |
+| Infrastructure | Terraform, AWS (EC2, Security Groups, IAM, SSM) |
 | CI/CD | GitHub Actions |
 | Security scanning | Bandit, pip-audit |
 | Linting / testing | Ruff, Pytest |
@@ -138,7 +138,8 @@ Push to main
                ▼
 ┌──────────────────────────────────┐
 │ CD (GitHub Actions)              │
-│  • SSH into EC2                  │
+│  • Configure AWS credentials     │
+│  • Deploy via AWS SSM            │
 │  • git pull                      │
 │  • docker compose down/up        │
 └──────────────────────────────────┘
@@ -159,6 +160,7 @@ Terraform provisions the complete AWS environment from scratch:
 | Internet Gateway | Enables inbound/outbound internet traffic |
 | Route table + association | Routes external traffic through the IGW |
 | Security group | Controls port access (honeypot public, monitoring restricted) |
+| IAM role + instance profile | Enables SSM access for agentless deployment |
 | EC2 instance | Runs the full Docker Compose stack |
 
 The EC2 instance bootstraps itself on first boot via a `user_data` script: installs Docker, clones the repo, writes the runtime `.env`, and starts the stack. No manual setup required after `terraform apply`.
@@ -233,6 +235,7 @@ After apply, the instance self-configures and the full stack starts automaticall
 - Credentials and sensitive config are injected via environment variables, not hardcoded
 - Intentional public exposure (honeypot) is separated from administrative and observability access
 - Static security scanning (Bandit) and dependency auditing (pip-audit) run on every push
+- Deployment uses AWS SSM instead of SSH, eliminating the need for exposed admin ports or long-lived SSH keys in CI/CD
 
 ---
 
@@ -243,7 +246,7 @@ After apply, the instance self-configures and the full stack starts automaticall
 - **Private IP detection:** The current check is a simple prefix match. A more robust implementation uses Python's `ipaddress` module to catch all reserved ranges.
 - **Alerting:** Prometheus alert rules and Grafana alerts (e.g., for attack spikes or service downtime) are not yet configured.
 - **Secret management:** Sensitive values are currently managed through Terraform variables. A more mature setup would use AWS SSM Parameter Store or Secrets Manager.
-- **Deployment method:** SSH-based CD is functional but not ideal for production. Future improvement would use AWS SSM or OIDC-based GitHub Actions authentication.
+- **Deployment**: CD deploys via AWS SSM. A more mature setup would use GitHub OIDC with IAM roles to eliminate stored AWS credentials entirely.
 
 ---
 
