@@ -4,7 +4,7 @@ metadata:
   name: ssh-honeypot
   namespace: ssh-honeypot
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: ssh-honeypot
   ports:

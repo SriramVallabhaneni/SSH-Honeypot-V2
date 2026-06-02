@@ -29,6 +29,9 @@ htmlcov/
 *.pid
 *.sock
 
+# k8s
+deploy/k8s/config/secret.yaml
+
 # Terraform
 .terraform/
 *.tfstate

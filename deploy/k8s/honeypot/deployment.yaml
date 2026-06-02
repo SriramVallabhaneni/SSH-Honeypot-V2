@@ -24,17 +24,11 @@ spec:
             - name: metrics
               containerPort: 8000
               hostPort: 8000
-          env:
-            - name: POSTGRES_DB
-              value: "honeypot"
-            - name: POSTGRES_USER
-              value: "honeypot"
-            - name: POSTGRES_PASSWORD
-              value: "honeypot"
-            - name: POSTGRES_HOST
-              value: "postgres"
-            - name: POSTGRES_PORT
-              value: "5432"
+          envFrom:
+            - configMapRef:
+                name: honeypot-config
+            - secretRef:
+                name: honeypot-secret
           resources:
             requests:
               cpu: "100m"
