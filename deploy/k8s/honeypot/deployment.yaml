@@ -18,7 +18,23 @@ spec:
           image: ssh-honeypot:local
           imagePullPolicy: Never
           ports:
-            - containerPort: 2222
+            - name: ssh
+              containerPort: 2222
+              hostPort: 2222
+            - name: metrics
+              containerPort: 8000
+              hostPort: 8000
+          env:
+            - name: POSTGRES_DB
+              value: "honeypot"
+            - name: POSTGRES_USER
+              value: "honeypot"
+            - name: POSTGRES_PASSWORD
+              value: "honeypot"
+            - name: POSTGRES_HOST
+              value: "postgres"
+            - name: POSTGRES_PORT
+              value: "5432"
           resources:
             requests:
               cpu: "100m"
