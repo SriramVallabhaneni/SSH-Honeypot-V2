@@ -9,7 +9,7 @@ from app.honeypot.config import Config
 
 
 def start_exporter(config: Config) -> None:
-    start_http_server(config.exporter_port, addr="0.0.0.0")
+    start_http_server(config.exporter_port, addr="0.0.0.0") # nosec B104 - required for Kubernetes ServiceMonitor scraping inside the cluster
 
     while True:
         with get_db_connection(config) as connection:
