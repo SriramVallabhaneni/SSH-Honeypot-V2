@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: ssh-honeypot
   namespace: ssh-honeypot
+  labels:
+    app: ssh-honeypot
 spec:
   type: ClusterIP
   selector:
