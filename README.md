@@ -1,6 +1,6 @@
 # SSH-Honeypot-V2
 
-A cloud-deployed SSH honeypot platform that captures real-world brute-force attack traffic, stores structured event data, and exposes operational metrics through a full observability stack. Built with Python, Docker, PostgreSQL, Prometheus, Grafana, Terraform, and GitHub Actions.
+A cloud-deployed SSH honeypot platform that captures real-world brute-force attack traffic, stores structured event data, and exposes operational metrics through a full observability stack. Built with Python, Docker, Kubernetes (k3s), PostgreSQL, Prometheus, Grafana, Terraform, AWS, and GitHub Actions.
 
 ---
 
@@ -28,6 +28,7 @@ This project was designed as a hands-on DevSecOps platform. Not just a security 
 
 - **Security engineering** — custom honeypot with real attack telemetry
 - **DevOps** — containerized, reproducible, and automatically deployed
+- **Cloud-native infrastructure** — Kubernetes deployment using k3s, StatefulSets, Services, ConfigMaps, Secrets, and PersistentVolumeClaims
 - **Infrastructure-as-code** — full AWS environment provisioned with Terraform
 - **Observability** — metrics pipeline from ingestion to dashboards
 - **CI/CD** — automated testing, security scanning, and deployment via GitHub Actions
@@ -64,7 +65,7 @@ Internet (SSH brute-force traffic)
 │                     │  credentials, geolocation
 └─────────────────────┘
 
-Infrastructure: AWS VPC → Subnet → EC2 → Docker Compose
+Infrastructure: AWS VPC → Subnet → EC2 → k3s → Kubernetes
 Provisioning:   Terraform
 CI/CD:          GitHub Actions (CI gate → CD deploy)
 ```
@@ -78,7 +79,8 @@ CI/CD:          GitHub Actions (CI gate → CD deploy)
 | Honeypot | Python, Paramiko |
 | Storage | PostgreSQL (psycopg) |
 | Observability | Prometheus, Grafana |
-| Containerization | Docker, Docker Compose |
+| Containerization | Docker |
+| Orchestration | Kubernetes (k3s) |
 | Infrastructure | Terraform, AWS (EC2, Security Groups, IAM, SSM) |
 | CI/CD | GitHub Actions |
 | Security scanning | Bandit, pip-audit |
@@ -97,6 +99,12 @@ SSH-Honeypot-V2/
 │   ├── exporter/         # Prometheus metrics definitions and HTTP server
 │   └── main.py           # Entry point
 ├── deploy/
+|   ├── k8s/
+│       ├── honeypot/
+│       ├── postgres/
+│       ├── config/
+│       ├── monitoring/
+│       └── namespace.yaml
 │   ├── docker-compose.yml
 │   ├── prometheus.yml
 │   └── grafana/          # Provisioned datasources and dashboards
