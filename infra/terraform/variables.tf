@@ -25,3 +25,9 @@ variable "postgres_password" {
   description = "Password for the internal Postgres container"
   sensitive   = true
 }
+
+variable "root_volume_size" {
+  description = "Root EBS volume size in GiB. Kubernetes plus monitoring needs more than a tiny root disk."
+  type        = number
+  default     = 20
+}

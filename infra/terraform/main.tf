@@ -37,7 +37,7 @@ resource "aws_security_group" "honeypot_sg" {
     protocol    = "tcp"
     cidr_blocks = [var.allowed_ip]
   }
-  
+
   # Honeypot SSH (open to world)
   ingress {
     from_port   = 2222
@@ -48,16 +48,16 @@ resource "aws_security_group" "honeypot_sg" {
 
   # Grafana (restrict to your IP)
   ingress {
-    from_port   = 3000
-    to_port     = 3000
+    from_port   = 30300
+    to_port     = 30300
     protocol    = "tcp"
     cidr_blocks = [var.allowed_ip]
   }
 
   # Prometheus (optional restrict)
   ingress {
-    from_port   = 9090
-    to_port     = 9090
+    from_port   = 30090
+    to_port     = 30090
     protocol    = "tcp"
     cidr_blocks = [var.allowed_ip]
   }
@@ -80,7 +80,7 @@ locals {
 }
 
 resource "aws_instance" "honeypot" {
-  ami           = "ami-0507f5acd9ba8e6b7" # update per region
+  ami           = "ami-06c77cb49ac92a541" # update per region
   instance_type = var.instance_type
 
   subnet_id              = aws_subnet.public.id
@@ -88,8 +88,13 @@ resource "aws_instance" "honeypot" {
 
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
-  key_name               = var.key_name
-  user_data              = local.user_data
+  key_name  = var.key_name
+  user_data = local.user_data
+
+  root_block_device {
+    volume_size = var.root_volume_size
+    volume_type = "gp3"
+  }
 
   tags = {
     Name = "honeypot-v2"
