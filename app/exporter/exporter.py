@@ -9,7 +9,7 @@ from app.honeypot.config import Config
 
 
 def start_exporter(config: Config) -> None:
-    start_http_server(config.exporter_port)
+    start_http_server(config.exporter_port, addr="0.0.0.0")
 
     while True:
         with get_db_connection(config) as connection:
