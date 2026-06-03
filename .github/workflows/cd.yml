@@ -21,15 +21,29 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-1
 
-      - name: Deploy via SSM
+      - name: Deploy to k3s via SSM
         run: |
           COMMAND_ID=$(aws ssm send-command \
             --instance-id ${{ secrets.EC2_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
             --parameters 'commands=[
-              "docker system prune -f",
-              "cd /opt/ssh-honeypot-v2 && git pull",
-              "cd /opt/ssh-honeypot-v2/deploy && docker compose down && docker compose up -d --build"
+              "set -euxo pipefail",
+              "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml",
+              "cd /opt/SSH-Honeypot-V2",
+              "git pull",
+              "docker build -t ssh-honeypot:local .",
+              "docker save ssh-honeypot:local | sudo k3s ctr images import -",
+              "kubectl apply -f deploy/k8s/namespace.yaml",
+              "kubectl apply -f deploy/k8s/config/configmap.yaml",
+              "kubectl apply -f deploy/k8s/config/secret.yaml",
+              "kubectl apply -f deploy/k8s/postgres/",
+              "kubectl apply -f deploy/k8s/honeypot/",
+              "helm upgrade --install monitoring prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace -f deploy/k8s/monitoring/values.yaml --timeout 10m",
+              "kubectl apply -f deploy/k8s/monitoring/honeypot-servicemonitor.yaml",
+              "kubectl rollout restart deployment/ssh-honeypot -n ssh-honeypot",
+              "kubectl rollout status deployment/ssh-honeypot -n ssh-honeypot --timeout=180s",
+              "kubectl get pods -n ssh-honeypot",
+              "kubectl get pods -n monitoring"
             ]' \
             --region us-west-1 \
             --query "Command.CommandId" \
