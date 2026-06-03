@@ -17,6 +17,7 @@ spec:
         - name: ssh-honeypot
           image: ssh-honeypot:local
           imagePullPolicy: Never
+
           ports:
             - name: ssh
               containerPort: 2222
@@ -24,11 +25,25 @@ spec:
             - name: metrics
               containerPort: 8000
               hostPort: 8000
+
           envFrom:
             - configMapRef:
                 name: honeypot-config
             - secretRef:
                 name: honeypot-secret
+
+          readinessProbe:
+            tcpSocket:
+              port: 2222
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            tcpSocket:
+              port: 2222
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
           resources:
             requests:
               cpu: "100m"
