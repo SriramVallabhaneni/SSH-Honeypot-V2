@@ -6,9 +6,9 @@ A cloud-deployed SSH honeypot platform that captures real-world brute-force atta
 
 ## What It Does
 
-The system exposes a fake SSH service to the internet. Automated scanners and bots attempt to log in and every connection attempt, credential pair, and session fingerprint is captured, enriched with geolocation data, and stored in PostgreSQL. A Prometheus exporter surfaces aggregate attack metrics, which Grafana visualizes in real time.
+The system exposes a fake SSH service to the internet. Automated scanners and bots attempt to log in and every connection attempt, credential pair, and session fingerprint is captured, enriched with geolocation data, and stored in PostgreSQL. A Prometheus exporter surfaces aggregate attack metrics, which Grafana visualizes in real time. The platform has been deployed on AWS EC2 using k3s and Kubernetes and validated against real internet traffic.
 
-This is not a pre-built tool. The SSH server, authentication handler, session model, metrics exporter, and enrichment pipeline are all custom-written.
+This is not a pre-built tool. The SSH server, authentication handler, session model, metrics exporter, and enrichment pipeline were developed from scratch. The platform is deployed on a self-managed K3s cluster using Kubernetes manifests, Helm, and automated CI/CD workflows.
 
 ---
 
@@ -99,15 +99,12 @@ SSH-Honeypot-V2/
 │   ├── exporter/         # Prometheus metrics definitions and HTTP server
 │   └── main.py           # Entry point
 ├── deploy/
-|   ├── k8s/
+|   └── k8s/
 │       ├── honeypot/
 │       ├── postgres/
 │       ├── config/
 │       ├── monitoring/
 │       └── namespace.yaml
-│   ├── docker-compose.yml
-│   ├── prometheus.yml
-│   └── grafana/          # Provisioned datasources and dashboards
 ├── infra/
 │   └── terraform/        # security groups, EC2
 ├── tests/                # Unit tests for config, session, geoip
@@ -150,11 +147,14 @@ Push to main
                │ passes
                ▼
 ┌──────────────────────────────────┐
-│ CD (GitHub Actions)              │
-│  • Configure AWS credentials     │
-│  • Deploy via AWS SSM            │
-│  • git pull                      │
-│  • docker compose down/up        │
+│ CD (GitHub Actions + AWS SSM)    │
+│  • Pull latest code              │
+│  • Build Docker image            │
+│  • Import image into             │
+│    k3s containerd                │
+│  • Apply Kubernetes manifests    │
+│  • Update ServiceMonitor         │
+│  • Perform deployment rollout    │
 └──────────────────────────────────┘
 ```
 
@@ -174,46 +174,21 @@ Terraform provisions the complete AWS environment from scratch:
 | Route table + association | Routes external traffic through the IGW |
 | Security group | Controls port access (honeypot public, monitoring restricted) |
 | IAM role + instance profile | Enables SSM access for agentless deployment |
-| EC2 instance | Runs the full Docker Compose stack |
+| EC2 instance | Hosts the k3s Kubernetes cluster |
 
-The EC2 instance bootstraps itself on first boot via a `user_data` script: installs Docker, clones the repo, writes the runtime `.env`, and starts the stack. No manual setup required after `terraform apply`.
+The EC2 instance bootstraps itself on first boot via cloud-init:
+1. Installs Docker
+2. Installs k3s
+3. Clones the repository
+4. Builds the honeypot image
+5. Imports the image into k3s
+6. Applies Kubernetes manifests
+7. Installs the monitoring stack
+8. Deploys observability resources
+
+No manual configuration is required after `terraform apply`
 
 Sensitive values (Postgres password, allowed IPs) are passed through Terraform variables and kept out of the public repository.
-
----
-
-## Local Setup
-
-**Prerequisites:** Python 3.12+, Docker, Docker Compose
-
-```bash
-git clone https://github.com/YOUR_USERNAME/SSH-Honeypot-V2.git
-cd SSH-Honeypot-V2
-
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-cp .env.example .env
-# edit .env with your local values
-
-cd deploy
-docker compose up --build
-```
-
-Test the honeypot:
-
-```bash
-ssh -p 2222 test@localhost
-# type any password, the attempt is logged and rejected
-```
-
-Check data:
-
-```bash
-docker compose exec postgres psql -U honeypot -d honeypot
-SELECT * FROM connections ORDER BY timestamp DESC LIMIT 10;
-```
 
 ---
 
@@ -226,7 +201,7 @@ terraform plan
 terraform apply
 ```
 
-After apply, the instance self-configures and the full stack starts automatically. Access Grafana at `http://<instance-ip>:3000` once containers are running.
+After apply, the instance self-configures and the full stack starts automatically. Access Grafana at `http://<instance-ip>:30300` and Prometheus at `http://<instance-ip>:30090` once containers are running.
 
 ---
 
@@ -242,13 +217,13 @@ After apply, the instance self-configures and the full stack starts automaticall
 
 ## Security Design
 
-- The honeypot never grants access, all authentication attempts fail by design
-- Monitoring ports (Grafana, Prometheus) are restricted to trusted IPs via security group rules
-- PostgreSQL is not exposed externally; it is internal to the Docker network
-- Credentials and sensitive config are injected via environment variables, not hardcoded
-- Intentional public exposure (honeypot) is separated from administrative and observability access
+- The honeypot never grants access; all authentication attempts fail by design
+- PostgreSQL is deployed as a Kubernetes StatefulSet and is never exposed publicly
+- Grafana and Prometheus are restricted to trusted IPs via Security Group rules
+- Runtime configuration is managed through Kubernetes ConfigMaps and Secrets
+- Prometheus discovers targets through ServiceMonitor resources rather than static endpoints
 - Static security scanning (Bandit) and dependency auditing (pip-audit) run on every push
-- Deployment uses AWS SSM instead of SSH, eliminating the need for exposed admin ports or long-lived SSH keys in CI/CD
+- Deployment uses AWS SSM instead of SSH, eliminating long-lived SSH keys from CI/CD
 
 ---
 
