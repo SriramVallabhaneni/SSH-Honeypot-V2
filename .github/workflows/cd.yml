@@ -29,7 +29,7 @@ jobs:
             --parameters 'commands=[
               "set -euxo pipefail",
               "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml",
-              "cd /opt/SSH-Honeypot-V2",
+              "cd /opt/ssh-honeypot-v2",
               "git pull",
               "docker build -t ssh-honeypot:local .",
               "docker save ssh-honeypot:local | sudo k3s ctr images import -",
